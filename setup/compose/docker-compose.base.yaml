@@ -1,0 +1,33 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4:9.13
+    container_name: pgadmin
+    restart: always
+    env_file:
+      - ../env/.env.base
+    ports:
+      - "5050:80"
+    networks:
+      - dev_net
+      - qa_net
+      - staging_net
+      - homolog_net
+      - prod_net
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+networks:
+  dev_net:
+    external: true
+  qa_net:
+    external: true
+  staging_net:
+    external: true
+  homolog_net:
+    external: true
+  prod_net:
+    external: true
+
+volumes:
+  pgadmin_data:
+    driver: local

@@ -1,0 +1,19 @@
+services:
+  database_prod:
+    image: postgres:18
+    container_name: database_prod
+    restart: always
+    env_file:
+      - ../env/.env.prod
+    networks:
+      - prod_net
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql
+
+networks:
+  prod_net:
+    external: true
+
+volumes:
+  postgres_prod_data:
+    driver: local

@@ -1,0 +1,53 @@
+services:
+  dev_database:
+    image: local/postgresql:v18.3
+    build:
+      context: ..
+      dockerfile: dockerfile/Dockerfile.database
+    pull_policy: never
+    container_name: dev_database
+    restart: always
+    env_file:
+      - ../env/.env.dev
+    networks:
+      - dev_net
+    volumes:
+      - dev_database_data:/var/lib/postgresql
+
+  dev_flyway:
+    image: flyway/flyway:12.1.0-alpine-mongo
+    container_name: dev_flyway
+    restart: "no"
+    env_file:
+      - ../env/.env.dev
+    environment:
+      FLYWAY_SCHEMAS: ops_flyway
+    networks:
+      - dev_net
+    volumes:
+      - ../../migrations:/flyway/sql
+    depends_on:
+      - dev_database
+
+  dev_pg_prove:
+    image: itheory/pg_prove:v3.37
+    container_name: dev_pg_prove
+    restart: "no"
+    env_file:
+      - ../env/.env.dev
+    networks:
+      - dev_net
+    depends_on:
+      - dev_database
+    volumes:
+      - ../../tests/unit:/tests/
+    entrypoint: ["sh", "-c"]
+    command: ["pg_prove /tests/*.test.sql"]
+
+networks:
+  dev_net:
+    external: true
+
+volumes:
+  dev_database_data:
+    driver: local

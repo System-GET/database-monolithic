@@ -1,0 +1,19 @@
+services:
+  database_qa:
+    image: postgres:18
+    container_name: database_qa
+    restart: always
+    env_file:
+      - ../env/.env.qa
+    networks:
+      - qa_net
+    volumes:
+      - postgres_qa_data:/var/lib/postgresql
+
+networks:
+  qa_net:
+    external: true
+
+volumes:
+  postgres_qa_data:
+    driver: local

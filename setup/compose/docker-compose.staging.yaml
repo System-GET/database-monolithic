@@ -1,0 +1,19 @@
+services:
+  database_staging:
+    image: postgres:18
+    container_name: database_staging
+    restart: always
+    env_file:
+      - ../env/.env.staging
+    networks:
+      - staging_net
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql
+
+networks:
+  staging_net:
+    external: true
+
+volumes:
+  postgres_staging_data:
+    driver: local

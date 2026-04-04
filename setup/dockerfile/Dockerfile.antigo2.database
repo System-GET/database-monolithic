@@ -1,0 +1,26 @@
+FROM postgres:18.3
+
+COPY postgresql-extensions/ /tmp/extensions/
+
+    # install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    postgresql-server-dev-18 \
+    unzip \
+    ca-certificates \
+    && set -eux \
+    
+    # unzip all extensions in /tmp/extensions
+    && cd /tmp/extensions \
+    && for file in *.zip; do \
+        [ -e "$file" ] && unzip "$file"; \
+    done \
+
+    # build and install all extensions in /tmp/extensions
+    && for dir in */; do \
+        (cd "$dir" && make && make install); \
+    done \
+
+    # clean up
+    && rm -rf /tmp/extensions \
+    && rm -rf /var/lib/apt/lists/*

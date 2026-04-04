@@ -1,0 +1,35 @@
+# STAGE 1: BUILD
+FROM postgres:18.3 AS builder
+
+COPY postgresql-extensions/ /tmp/extensions/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  # install build dependencies
+  build-essential \
+  postgresql-server-dev-18 \
+  unzip \
+  ca-certificates \
+  && set -eux \
+  
+  # unzip all extensions
+  && cd /tmp/extensions \
+  && for file in *.zip; do \
+    [ -e "$file" ] && unzip "$file"; \
+  done \
+  
+  # build and install extensions
+  && for dir in */; do \
+    [ -d "$dir" ] && (cd "$dir" && make && make install); \
+  done \
+  
+  # cleanup build stage
+  && rm -rf /tmp/extensions \
+  && rm -rf /var/lib/apt/lists/* \
+  && apt-get clean
+
+
+
+# STAGE 2: RUNTIME
+FROM postgres:18.3
+COPY --from=builder /usr/lib/postgresql/18/lib/ /usr/lib/postgresql/18/lib/
+COPY --from=builder /usr/share/postgresql/18/extension/ /usr/share/postgresql/18/extension/

@@ -1,0 +1,19 @@
+services:
+  database_homolog:
+    image: postgres:18
+    container_name: database_homolog
+    restart: always
+    env_file:
+      - ../env/.env.homolog
+    networks:
+      - homolog_net
+    volumes:
+      - postgres_homolog_data:/var/lib/postgresql
+
+networks:
+  homolog_net:
+    external: true
+
+volumes:
+  postgres_homolog_data:
+    driver: local

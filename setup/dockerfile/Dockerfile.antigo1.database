@@ -1,0 +1,47 @@
+FROM postgres:18.3
+
+COPY postgresql-extensions/pg_cron-1.6.7.zip    /tmp/pg_cron-1.6.7.zip
+COPY postgresql-extensions/pg_partman-5.4.3.zip /tmp/pg_partman-5.4.3.zip
+COPY postgresql-extensions/pgaudit-1.0.0.zip    /tmp/pgaudit-1.0.0.zip
+COPY postgresql-extensions/pgtap-1.3.4.zip      /tmp/pgtap-1.3.4.zip
+
+    # install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    postgresql-server-dev-18 \
+    unzip \
+    
+    # build and install pg_cron
+    && cd /tmp \
+    && unzip pg_cron-1.6.7.zip \
+    && cd pg_cron-1.6.7 \
+    && make \
+    && make install \
+    && rm -rf /tmp/pg_cron* \
+
+    # build and install pg_partman
+    && cd /tmp \
+    && unzip pg_partman-5.4.3.zip \
+    && cd pg_partman-5.4.3 \
+    && make \
+    && make install \
+    && rm -rf /tmp/pg_partman* \
+
+    # build and install pgaudit
+    && cd /tmp \
+    && unzip pgaudit-1.0.0.zip \
+    && cd pgaudit-1.0.0 \
+    && make \
+    && make install \
+    && rm -rf /tmp/pgaudit* \
+
+    # build and install pgtap
+    && cd /tmp \
+    && unzip pgtap-1.3.4.zip \
+    && cd pgtap-1.3.4 \
+    && make \
+    && make install \
+    && rm -rf /tmp/pgtap* \
+
+    # clean up
+    && rm -rf /var/lib/apt/lists/*
